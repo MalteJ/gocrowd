@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+set -e            # fail fast
+set -o pipefail   # don't ignore exit codes when piping output
+set -x          # enable debugging
+
+# Configure directories
+build_dir=$1
+cache_dir=$2
+
+
+compile_buildpack_dir=$(cd $(dirname $0); cd ..; pwd)
+compile_buildpack_bin=$compile_buildpack_dir/bin
+
+# Load some convenience functions like status(), echo(), and indent()
+source $compile_buildpack_dir/bin/common.sh
+
+cd $build_dir
+
+# Alternate root location (default is root of project) for html/js/css
+# root: dist/
+if [[ "$(grep root: Staticfile)X" != "X" ]]; then
+  root_dir=$(grep root: Staticfile | sed -e 's/^root: *//')
+  status "Root folder $root_dir"
+else
+  status "Using root folder"
+fi
+root_dir=${root_dir:-.}
+
+mkdir -p $cache_dir
+cp -ra $root_dir $cache_dir/htdocs
+cd $cache_dir
+
+cd $compile_buildpack_dir/src
+go build gocrowd.go
+cp gocrowd $cache_dir/
+
+cp -ra $cache_dir/* $build_dir/*
