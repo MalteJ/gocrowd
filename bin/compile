@@ -9,6 +9,7 @@ set -x          # enable debugging
 build_dir=$1
 cache_dir=$2
 
+df -h
 
 compile_buildpack_dir=$(cd $(dirname $0); cd ..; pwd)
 compile_buildpack_bin=$compile_buildpack_dir/bin
@@ -28,8 +29,8 @@ else
 fi
 root_dir=${root_dir:-.}
 
-mkdir -p $cache_dir
-cp -ra $root_dir $cache_dir/htdocs
+mkdir -p $cache_dir/gocrowd
+cp -ra $root_dir $cache_dir/gocrowd/htdocs
 cd $cache_dir
 
 curl -L https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz | tar xz
@@ -40,6 +41,6 @@ mkdir -p $GOHOME
 
 cd $compile_buildpack_dir/src
 go build gocrowd.go
-cp gocrowd $cache_dir/
+cp gocrowd $cache_dir/gocrowd/
 
-cp -ra $cache_dir/* $build_dir/
+cp -ra $cache_dir/gocrowd/* $build_dir/
