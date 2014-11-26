@@ -9,12 +9,13 @@ import (
     "net/http"
     "net/url"
     "os"
+    "strconv"
     "strings"
     "sync"
 )
 
-var max_cached_file_size = int64(20*1024*1024) // 2 MB
-var max_cache_size = int64(100*1024*1024) // 100 MB
+var max_cached_file_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHED_FILE_SIZE"), 10, 64)
+var max_cache_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHED_SIZE"), 10, 64)
 var cached_bytes = int64(0)
 
 type Cache struct {
@@ -181,6 +182,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
         cache.items[path] = file_content
         cache.lock.Unlock()
 
+        mimetype := http.DetectContentType(file_content)
+        w.Header().Set("Content-Type", mimetype)
         _, err = w.Write(file_content)
         if err != nil {
             log.Print(err)
