@@ -53,6 +53,7 @@ type CrowdAuthRequest struct {
 
 func authenticate(username, password string) bool {
     if p, ok := authCache.Get(username); ok && string(p) == password {
+        log.Print("AuthCache Hit: "+username)
         return true
     }
 
@@ -80,6 +81,7 @@ func authenticate(username, password string) bool {
     }
 
     if resp.StatusCode == 200 {
+        log.Printf("Adding User '%s' to AuthCache", username)
         authCache.Set(username, []byte(password))
         return true
     } else {
@@ -147,7 +149,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
     content, ok := cache.Get(path)
     if ok {  // Get Content from Cache
-        log.Print("Hit the cache: "+path)
+        log.Print("ContentCache Hit: "+path)
         w.Write(content)
         return
     }
