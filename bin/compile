@@ -20,8 +20,7 @@ cd $build_dir
 
 mkdir -p $cache_dir
 cd $cache_dir
-wget --no-check-certificate https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
-tar xzvf go1.3.3.linux-amd64.tar.gz
+curl -L https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz | tar xz
 export GOROOT=`pwd`/go
 export PATH=$PATH:$GOROOT/bin
 export GOHOME=`pwd`/.go
