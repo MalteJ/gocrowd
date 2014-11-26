@@ -8,7 +8,12 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-    f := "htdocs"+r.RequestURI
+    uri := r.RequestURI
+    if uri[len(uri)-1] == '/' {
+        uri = uri + "index.html"
+    }
+
+    f := "htdocs"+uri
 
     file_content, err := ioutil.ReadFile(f)
     if err != nil {
