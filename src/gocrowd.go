@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "io/ioutil"
     "log"
+    "mime"
     "net/http"
     "net/url"
     "os"
@@ -15,7 +16,7 @@ import (
 )
 
 var max_cached_file_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHED_FILE_SIZE"), 10, 64)
-var max_cache_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHED_SIZE"), 10, 64)
+var max_cache_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHE_SIZE"), 10, 64)
 var cached_bytes = int64(0)
 
 type Cache struct {
@@ -182,7 +183,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
         cache.items[path] = file_content
         cache.lock.Unlock()
 
-        mimetype := http.DetectContentType(file_content)
+        f_spl := strings.Split(f, ".")
+        ext := "."+f_spl[len(f_spl)-1]
+        mimetype := mime.TypeByExtension(ext)
         w.Header().Set("Content-Type", mimetype)
         _, err = w.Write(file_content)
         if err != nil {
