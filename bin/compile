@@ -18,6 +18,14 @@ source $compile_buildpack_dir/bin/common.sh
 
 cd $build_dir
 
+cd $cache_dir
+wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
+tar xzvf go1.3.3.linux-amd64.tar.gz
+export GOROOT=`pwd`/go
+export PATH=$PATH:$GOROOT/bin
+export GOHOME=`pwd`/.go
+mkdir -p $GOHOME
+
 # Alternate root location (default is root of project) for html/js/css
 # root: dist/
 if [[ "$(grep root: Staticfile)X" != "X" ]]; then
