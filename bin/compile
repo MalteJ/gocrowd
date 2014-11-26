@@ -29,8 +29,8 @@ else
 fi
 root_dir=${root_dir:-.}
 
-mkdir -p $cache_dir/gocrowd
-cp -ra $root_dir $cache_dir/gocrowd/htdocs
+mkdir -p $cache_dir/target
+cp -ra $root_dir $cache_dir/target/htdocs
 cd $cache_dir
 
 curl -L https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz | tar xz
@@ -41,6 +41,6 @@ mkdir -p $GOHOME
 
 cd $compile_buildpack_dir/src
 go build gocrowd.go
-cp gocrowd $cache_dir/gocrowd/
+cp gocrowd $cache_dir/target/
 
-cp -ra $cache_dir/gocrowd/* $build_dir/
+cp -ra $cache_dir/target/* $build_dir/
