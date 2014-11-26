@@ -29,7 +29,7 @@ fi
 root_dir=${root_dir:-.}
 
 mkdir -p $cache_dir
-cp -ra $root_dir $build_dir/htdocs
+cp -ra $root_dir $cache_dir/htdocs
 cd $cache_dir
 
 curl -L https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz | tar xz
