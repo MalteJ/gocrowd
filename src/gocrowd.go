@@ -12,12 +12,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
     file_content, err := ioutil.ReadFile(f)
     if err != nil {
-        log.Info(err)
+        log.Print(err)
     }
 
     _, err = w.Write(file_content)
     if err != nil {
-        log.Info(err)
+        log.Print(err)
     }
 }
 
