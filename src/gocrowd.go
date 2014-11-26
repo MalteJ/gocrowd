@@ -144,6 +144,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
             return            
         }
     } else {  // No Authentication Information provided
+        log.Printf("No Auth Header sent: %s %s", r.Method, r.URL)
         w.Header().Set("WWW-Authenticate", `Basic realm="hybris Crowd Login"`)
         w.WriteHeader(401)
         w.Write([]byte("<h1>Unauthorized</h1><p>Please sign in with your Crowd credentials.</p>"))
