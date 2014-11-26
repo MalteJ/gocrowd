@@ -24,6 +24,19 @@ type Cache struct {
     lock  sync.Mutex
 }
 
+func (c *Cache) Set(key string, value []byte) {
+    c.lock.Lock()
+    c.items[key] = value
+    c.lock.Unlock()
+}
+
+func (c *Cache) Get(key string) ([]byte, bool) {
+    c.lock.Lock()
+    value, ok := c.items[key]
+    c.lock.Unlock()
+    return value, ok
+}
+
 func NewCache() *Cache {
     return &Cache{
         items: map[string][]byte{},
@@ -32,12 +45,17 @@ func NewCache() *Cache {
 }
 
 var cache = NewCache()
+var authCache = NewCache()
 
 type CrowdAuthRequest struct {
     Value string `json:"value"`
 }
 
 func authenticate(username, password string) bool {
+    if p, ok := authCache.Get(username); ok && string(p) == password {
+        return true
+    }
+
     url := os.Getenv("CROWD_URL")+"/rest/usermanagement/1/authentication?username=" + username
     body_struct := &CrowdAuthRequest{Value:password}
     body, _ := json.Marshal(body_struct)
@@ -62,6 +80,7 @@ func authenticate(username, password string) bool {
     }
 
     if resp.StatusCode == 200 {
+        authCache.Set(username, []byte(password))
         return true
     } else {
         return false
@@ -126,9 +145,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
     // Check if path is already in Cache
     path := r.URL.Path
 
-    cache.lock.Lock()
-    content, ok := cache.items[path]
-    cache.lock.Unlock()
+    content, ok := cache.Get(path)
     if ok {  // Get Content from Cache
         log.Print("Hit the cache: "+path)
         w.Write(content)
@@ -179,9 +196,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
             log.Print(err)
         }
 
-        cache.lock.Lock()
-        cache.items[path] = file_content
-        cache.lock.Unlock()
+        cache.Set(path, file_content)
 
         f_spl := strings.Split(f, ".")
         ext := "."+f_spl[len(f_spl)-1]
