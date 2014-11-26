@@ -1,6 +1,6 @@
 set -e
 set -x
-export APP_ROOT=/app
+export APP_ROOT=`pwd`
 
 #if [ -f $APP_ROOT/gocrowd/htdocs/gocrowd.json ]
 #then
