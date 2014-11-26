@@ -13,7 +13,7 @@ import (
     "sync"
 )
 
-var max_cached_file_size = int64(20)//*1024*1024) // 2 MB
+var max_cached_file_size = int64(20*1024*1024) // 2 MB
 var max_cache_size = int64(100*1024*1024) // 100 MB
 var cached_bytes = int64(0)
 
@@ -58,7 +58,7 @@ func authenticate(username, password string) bool {
         log.Print("Crowd Response Code: "+resp.Status)
         log.Print("Crowd Response Body: "+resp_body)
     }
-    
+
     if resp.StatusCode == 200 {
         return true
     } else {
