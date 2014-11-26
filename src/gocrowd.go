@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+    "io/ioutil"
     "log"
     "net/http"
     "os"
@@ -10,14 +10,14 @@ import (
 func handler(w http.ResponseWriter, r *http.Request) {
     f := "htdocs"+r.RequestURI
 
-    file_content, err := ioutil.ReadFile(r.RequestURI)
+    file_content, err := ioutil.ReadFile(f)
     if err != nil {
-        log.Error(err)
+        log.Fatal(err)
     }
 
-    err := w.Write(file_content)
+    _, err = w.Write(file_content)
     if err != nil {
-        log.Error(err)
+        log.Fatal(err)
     }
 }
 
