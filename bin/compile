@@ -18,14 +18,6 @@ source $compile_buildpack_dir/bin/common.sh
 
 cd $build_dir
 
-mkdir -p $cache_dir
-cd $cache_dir
-curl -L https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz | tar xz
-export GOROOT=`pwd`/go
-export PATH=$PATH:$GOROOT/bin
-export GOHOME=`pwd`/.go
-mkdir -p $GOHOME
-
 # Alternate root location (default is root of project) for html/js/css
 # root: dist/
 if [[ "$(grep root: Staticfile)X" != "X" ]]; then
@@ -37,8 +29,14 @@ fi
 root_dir=${root_dir:-.}
 
 mkdir -p $cache_dir
-cp -ra $root_dir $cache_dir/htdocs
+cp -ra $root_dir $build_dir/htdocs
 cd $cache_dir
+
+curl -L https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz | tar xz
+export GOROOT=`pwd`/go
+export PATH=$PATH:$GOROOT/bin
+export GOHOME=`pwd`/.go
+mkdir -p $GOHOME
 
 cd $compile_buildpack_dir/src
 go build gocrowd.go
