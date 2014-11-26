@@ -4,6 +4,7 @@ import (
     "bytes"
     "encoding/base64"
     "encoding/json"
+    "io"
     "io/ioutil"
     "log"
     "mime"
@@ -196,8 +197,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
     // Read File
     file_size := fi.Size()
 
+    // Set MimeType
+    f_spl := strings.Split(f, ".")
+    ext := "."+f_spl[len(f_spl)-1]
+    mimetype := mime.TypeByExtension(ext)
+    w.Header().Set("Content-Type", mimetype)
     // save Content in Cache if sizes match and send content to client
     if file_size <= max_cached_file_size && cached_bytes + file_size <= max_cache_size {
+        log.Printf("Caching %s with Content-Type: %s", f, mimetype)
         cached_bytes = cached_bytes + file_size
 
         file_content, err := ioutil.ReadFile(f)
@@ -205,23 +212,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
             log.Print(err)
         }
 
-
-        f_spl := strings.Split(f, ".")
-        ext := "."+f_spl[len(f_spl)-1]
-        mimetype := mime.TypeByExtension(ext)
-        log.Printf("Caching %s with Content-Type: %s", f, mimetype)
-
         cache.Set(path, Item{Data: file_content, Mimetype: mimetype})
 
-        w.Header().Set("Content-Type", mimetype)
         _, err = w.Write(file_content)
         if err != nil {
             log.Print(err)
         }
     } else {  // don't cache, stream directly from disk to client
         log.Print("Do not cache "+f)
-        w.WriteHeader(418)
-        w.Write([]byte("<h1>I'm a teapot</h1>"))
+        fr, err := os.Open(f)
+        if err != nil {
+            log.Print(err)
+        }
+
+        _, err = io.Copy(w, fr)
+        if err != nil {
+            log.Print(err)
+        }
     }
 }
 
