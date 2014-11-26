@@ -42,5 +42,6 @@ mkdir -p $GOHOME
 cd $compile_buildpack_dir/src
 go build gocrowd.go
 cp gocrowd $cache_dir/target/
+mkdir -p $cache_dir/target/logs
 
 cp -ra $cache_dir/target/* $build_dir/
