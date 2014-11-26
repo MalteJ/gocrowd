@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # bin/detect <build-dir>
 
-if [ -f $1/Staticfile ]; then
+if [ -f $1/htdocs/Staticfile ]; then
   echo "Static file" && exit 0
 else
   echo "no" && exit 1
