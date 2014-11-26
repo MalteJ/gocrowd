@@ -12,4 +12,4 @@ echo "My outgoing IP to Crowd:" `curl ifconfig.co 2> /dev/null`
 
 #(tail -f -n 0 $APP_ROOT/gocrowd/logs/*log &)
 #cd $APP_ROOT/gocrowd
-exec gocrowd
+exec $APP_ROOT/gocrowd/gocrowd

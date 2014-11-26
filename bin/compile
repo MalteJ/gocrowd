@@ -9,8 +9,6 @@ set -x          # enable debugging
 build_dir=$1
 cache_dir=$2
 
-df -h
-
 compile_buildpack_dir=$(cd $(dirname $0); cd ..; pwd)
 compile_buildpack_bin=$compile_buildpack_dir/bin
 
@@ -43,4 +41,5 @@ cd $compile_buildpack_dir/src
 go build gocrowd.go
 cp gocrowd $cache_dir/target/
 
-cp -ra $cache_dir/target/* $build_dir/
+cp -ra $cache_dir/target $build_dir/gocrowd
+cp $compile_buildpack_bin/boot.sh $build_dir/
