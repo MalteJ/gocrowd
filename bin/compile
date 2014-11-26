@@ -42,4 +42,4 @@ cd $compile_buildpack_dir/src
 go build gocrowd.go
 cp gocrowd $cache_dir/
 
-cp -ra $cache_dir/* $build_dir/*
+cp -ra $cache_dir/* $build_dir/
