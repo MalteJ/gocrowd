@@ -77,6 +77,7 @@ func authenticate(username, password string) bool {
     resp, err := client.Do(req)
     if err != nil {
         log.Print(err)
+        return false
     }
     defer resp.Body.Close()
 
