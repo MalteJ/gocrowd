@@ -19,18 +19,24 @@ var max_cached_file_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHED_FILE_SIZE")
 var max_cache_size, _ = strconv.ParseInt(os.Getenv("MAX_CACHE_SIZE"), 10, 64)
 var cached_bytes = int64(0)
 
+type Item struct {
+    Data []byte
+    Ttl int64
+    Mimetype string
+}
+
 type Cache struct {
-    items map[string][]byte
+    items map[string]Item
     lock  sync.Mutex
 }
 
-func (c *Cache) Set(key string, value []byte) {
+func (c *Cache) Set(key string, value Item) {
     c.lock.Lock()
     c.items[key] = value
     c.lock.Unlock()
 }
 
-func (c *Cache) Get(key string) ([]byte, bool) {
+func (c *Cache) Get(key string) (Item, bool) {
     c.lock.Lock()
     value, ok := c.items[key]
     c.lock.Unlock()
@@ -39,7 +45,7 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 
 func NewCache() *Cache {
     return &Cache{
-        items: map[string][]byte{},
+        items: map[string]Item{},
         lock: sync.Mutex{},
     }
 }
@@ -52,7 +58,7 @@ type CrowdAuthRequest struct {
 }
 
 func authenticate(username, password string) bool {
-    if p, ok := authCache.Get(username); ok && string(p) == password {
+    if i, ok := authCache.Get(username); ok && string(i.Data) == password {
         log.Print("AuthCache Hit: "+username)
         return true
     }
@@ -82,7 +88,7 @@ func authenticate(username, password string) bool {
 
     if resp.StatusCode == 200 {
         log.Printf("Adding User '%s' to AuthCache", username)
-        authCache.Set(username, []byte(password))
+        authCache.Set(username, Item{Data: []byte(password)})
         return true
     } else {
         return false
@@ -147,10 +153,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
     // Check if path is already in Cache
     path := r.URL.Path
 
-    content, ok := cache.Get(path)
+    item, ok := cache.Get(path)
     if ok {  // Get Content from Cache
-        log.Print("ContentCache Hit: "+path)
-        w.Write(content)
+        log.Printf("ContentCache Hit: %s (Content-Type: %s)", path, item.Mimetype)
+        w.Header().Set("Content-Type", item.Mimetype)
+        w.Write(item.Data)
         return
     }
 
@@ -190,7 +197,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
     // save Content in Cache if sizes match and send content to client
     if file_size <= max_cached_file_size && cached_bytes + file_size <= max_cache_size {
-        log.Print("Caching "+f)
         cached_bytes = cached_bytes + file_size
 
         file_content, err := ioutil.ReadFile(f)
@@ -198,11 +204,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
             log.Print(err)
         }
 
-        cache.Set(path, file_content)
 
         f_spl := strings.Split(f, ".")
         ext := "."+f_spl[len(f_spl)-1]
         mimetype := mime.TypeByExtension(ext)
+        log.Printf("Caching %s with Content-Type: %s", f, mimetype)
+
+        cache.Set(path, Item{Data: file_content, Mimetype: mimetype})
+
         w.Header().Set("Content-Type", mimetype)
         _, err = w.Write(file_content)
         if err != nil {
