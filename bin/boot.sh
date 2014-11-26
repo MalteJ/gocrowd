@@ -1,5 +1,3 @@
-set -e
-set -x
 export APP_ROOT=`pwd`
 
 #if [ -f $APP_ROOT/gocrowd/htdocs/gocrowd.json ]
@@ -13,5 +11,5 @@ export APP_ROOT=`pwd`
 echo "My outgoing IP to Crowd:" `curl ifconfig.co 2> /dev/null`
 
 #(tail -f -n 0 $APP_ROOT/gocrowd/logs/*log &)
-cd $APP_ROOT/gocrowd
-exec $APP_ROOT/gocrowd/gocrowd
+#cd $APP_ROOT/gocrowd
+exec gocrowd
