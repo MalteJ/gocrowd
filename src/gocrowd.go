@@ -9,11 +9,25 @@ import (
 
 func handler(w http.ResponseWriter, r *http.Request) {
     uri := r.RequestURI
-    if uri[len(uri)-1] == '/' {
-        uri = uri + "index.html"
+    f := "htdocs"+uri
+
+    fi, err := os.Stat(f)
+    if err != nil {
+        log.Print(err)
     }
 
-    f := "htdocs"+uri
+    if fi.IsDir() {
+        if f[len(f)-1] != '/' {
+            f = f + "/"
+        }
+        f = f + "index.html"
+    }
+
+    fi, err = os.Stat(f)
+    if err != nil {
+        log.Print(err)
+    }
+
 
     file_content, err := ioutil.ReadFile(f)
     if err != nil {
