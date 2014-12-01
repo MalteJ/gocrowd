@@ -234,7 +234,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-    log.Infof("Starting GoCrowd...")
+    log.Print("Starting GoCrowd...")
     http.HandleFunc("/", handler)
     http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
