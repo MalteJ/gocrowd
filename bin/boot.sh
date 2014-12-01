@@ -5,7 +5,7 @@ export APP_ROOT=`pwd`
 #  mv $APP_ROOT/gocrowd/htdocs/gocrowd.json $APP_ROOT/gocrowd/gocrowd.json
 #fi
 
-echo "My outgoing IP to Crowd:" `curl ifconfig.co 2> /dev/null`
+#echo "My outgoing IP to Crowd:" `curl ifconfig.co 2> /dev/null`
 
 cd $APP_ROOT/gocrowd
 exec $APP_ROOT/gocrowd/gocrowd
