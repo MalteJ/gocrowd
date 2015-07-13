@@ -93,7 +93,7 @@ func authenticate(username, password string) (bool, error) {
 		log.Printf("Adding User '%s' to AuthCache", username)
 		authCache.Set(username, Item{Data: []byte(password)})
 		return true, nil
-	} else if resp.StatusCode == 403 {
+	} else if resp.StatusCode == 400 {
 		return false, nil
 	} else {
 		return false, errors.New("Error while authenticating against Crowd")
